@@ -35,7 +35,7 @@ export const roleService = {
 
   createrole: async (data) => {
     try {
-      const res = await Api.post("/hrms/designation", data);
+      const res = await Api.post("/hrms/addrole", data);
       const msg = extractMessage(res, "role created successfully");
       message.success(msg);
       return { success: true, data: res.data, statusCode: res.status };
