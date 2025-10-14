@@ -4,12 +4,13 @@ import HrmsDashboard from "./pages/Dashboard";
 import AttendanceMaster from "./pages/AttendanceMaster/AttendanceMaster";
 import Shift from "./pages/ShiftMaster/Shift";
 import Shiftform from "./pages/ShiftMaster/Shiftform";
-import Employee from "./pages/EmployeeMaster/Employee/Employee";
+import Employee from "./pages/EmployeeMaster/Employee/Employee.jsx";
 import EmployeeForm from "./pages/EmployeeMaster/Employee/Employeeform";
 import EmployeeDetails from "./pages/EmployeeMaster/Employee/EmployeeDetails";
 import Department from "./pages/EmployeeMaster/Department/Department.jsx";
 import Designation from "./pages/EmployeeMaster/Designation/Designation.jsx";
 import EmployeePersonal from "./pages/EmployeeMaster/Employee/EmployeePersonal.jsx";
+
 
 export const hrmsMenuItems = [
   {

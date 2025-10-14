@@ -50,7 +50,6 @@ const EmployeeForm = () => {
       width={800}
       destroyOnClose
     >
-      <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
 
       {/* Profile Upload */}
       <div className="flex items-center gap-6 mb-6">
@@ -75,9 +74,9 @@ const EmployeeForm = () => {
         <Row gutter={16}>
           <Col xs={24} sm={8}>
             <Form.Item
-              name="employee_code"
-              label="Employee Code"
-              rules={[{ required: true, message: "Enter Employee Code" }]}
+              name="employee_Id"
+              label="Employee ID"
+              rules={[{ required: true, message: "Enter Employee Id" }]}
             >
               <Input placeholder="EMP001" />
             </Form.Item>
@@ -144,6 +143,17 @@ const EmployeeForm = () => {
                 <Select.Option value="contract">Contract</Select.Option>
                 <Select.Option value="intern">Intern</Select.Option>
               </Select>
+            </Form.Item>
+          </Col>
+
+
+          <Col xs={24} sm={8}>
+            <Form.Item
+              name="role"
+              label="Role"
+              rules={[{ required: true, message: "Enter Role" }]}
+            >
+              <Input placeholder="Role" />
             </Form.Item>
           </Col>
 

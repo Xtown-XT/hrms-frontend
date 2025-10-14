@@ -75,11 +75,7 @@ export default function Departments() {
       dataIndex: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
-    {
-      title: "No of Employees",
-      dataIndex: "employees",
-      sorter: (a, b) => a.employees - b.employees,
-    },
+    
     {
       title: "Status",
       dataIndex: "status",
@@ -210,15 +206,7 @@ export default function Departments() {
             />
           </Form.Item>
 
-          <Form.Item
-            name="employees"
-            label="No. of Employees"
-            rules={[
-              { required: true, message: "Please enter number of employees" },
-            ]}
-          >
-            <InputNumber min={1} className="w-full" placeholder="Enter count" />
-          </Form.Item>
+          
 
           <Form.Item
             name="status"
