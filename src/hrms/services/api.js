@@ -1,10 +1,7 @@
 import axios from "axios";
-// import { handleApiError } from "../../utils/errorHandler";
 
 const Api = axios.create({
   baseURL: "http://192.168.1.23:4001/api",
-
-  // http://10.0.4.93:3001/api/v1
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -14,7 +11,6 @@ const Api = axios.create({
 // Request interceptor
 Api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage
 
     const token =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3RfbmFtZSI6Ilh0b3duIiwibGFzdF9uYW1lIjoiQWRtaW4iLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsIm1vYmlsZSI6Ijk4NzQ1NjMyMTAiLCJjb21wYW55X2lkIjpudWxsLCJicmFuY2hfaWQiOm51bGwsImRlcGFydG1lbnRfaWQiOm51bGwsImRpdmlzdGlvbl9pZCI6bnVsbCwicm9sZV9pZCI6MSwiaXNfYWN0aXZlIjp0cnVlLCJ0b2tlbiI6bnVsbCwidXNlcl9hZ2VudCI6bnVsbCwic3VibW9kdWwiOm51bGwsImNyZWF0ZWRfYnkiOjAsInVwZGF0ZWRfYnkiOjAsImNyZWF0ZWRfYXQiOiIyMDI1LTA2LTA1VDA4OjQzOjQwLjYyMloiLCJ1cGRhdGVkX2F0IjoiMjAyNS0wNi0wNVQwODo0Mzo0MC42MjJaIiwiZGVsZXRlZF9hdCI6bnVsbCwiZGVsZXRlZF9ieSI6bnVsbCwiaWF0IjoxNzQ5MTIzNTUzLCJleHAiOjE3NDkxMjcxNTN9.dkkEqR_OPxIL6Q1CikGhV7644Lvr_6nARc2qiKSaOa8";
@@ -59,3 +55,4 @@ export const authService = {
 };
 
 export default Api;
+

@@ -122,15 +122,15 @@ export default function Departments() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-2xl font-bold">Departments</h1>
+          
           <p className="text-sm text-gray-500">Employee / Departments</p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* ✅ Export button */}
-          <Button icon={<ExportOutlined />} onClick={handleExport}>
+          {/* <Button icon={<ExportOutlined />} onClick={handleExport}>
             Export
-          </Button>
+          </Button> */}
 
           <Button
             type="primary"
@@ -145,7 +145,7 @@ export default function Departments() {
 
       {/* Filters */}
       <div className="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg shadow-sm mb-4">
-        <h2 className="font-semibold text-lg">Department List</h2>
+        <h2 className="font-semibold text-xl">Department List</h2>
 
         <div className="flex flex-wrap gap-2 items-center">
           <Select
