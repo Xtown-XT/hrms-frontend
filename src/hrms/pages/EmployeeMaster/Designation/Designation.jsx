@@ -127,14 +127,13 @@ export default function Designations() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-2xl font-bold">Designations</h1>
           <p className="text-sm text-gray-500">Employee / Designations</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button icon={<ExportOutlined />} onClick={handleExport}>
+          {/* <Button icon={<ExportOutlined />} onClick={handleExport}>
             Export
-          </Button>
+          </Button> */}
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -148,7 +147,7 @@ export default function Designations() {
 
       {/* Filters */}
       <div className="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg shadow-sm mb-4">
-        <h2 className="font-semibold text-lg">Designation List</h2>
+        <h2 className="font-semibold text-xl">Designation List</h2>
 
         <div className="flex flex-wrap gap-2 items-center">
           <Select

@@ -1,15 +1,14 @@
 import axios from "axios";
-// import { handleApiError } from "../../utils/errorHandler";
 
-const Api = axios.create({
-  baseURL: "http://192.168.1.22:4001/api",
-
-  // http://10.0.4.93:3001/api/v1
+const api = axios.create({
+  baseURL: "http://192.168.1.12:4001/hrms_api/v1/",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+
 
 // // Request interceptor
 // Api.interceptors.request.use(
@@ -58,4 +57,4 @@ const Api = axios.create({
 //   },
 // };
 
-export default Api;
+export default api;

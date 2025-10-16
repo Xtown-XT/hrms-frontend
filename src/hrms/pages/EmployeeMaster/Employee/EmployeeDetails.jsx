@@ -751,159 +751,292 @@ const Employee = () => {
         ]);
         message.success("Employee added successfully!");
       }
-
       setAddEditModalVisible(false);
       setProfileImage(null);
       form.resetFields();
       setIsEditing(false);
     });
   };
-
   return (
-    <div className="bg-white p-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
-        <h1 className="text-4xl font-extrabold mb-6 bg-clip-text text-transparent bg-purple-500">UnRegistered Employees</h1>
-        <Space>
-          <Input.Search placeholder="Search name" allowClear style={{ width: 200 }} />
-          <Popover
-            content={<FiltersPopover onApply={(filters) => console.log(filters)} />}
-            trigger="click"
-            placement="bottomLeft"
-          >
-            <Button icon={<FilterOutlined />}>Filters</Button>
-          </Popover>
-        </Space>
-      </div>
+    // <div className="bg-white p-4">
+    //   {/* Header */}
+    //   <div className="flex flex-col sm:flex-row justify-between items-center mb-3">
+    //     {<span className="text-xl font-bold">UnRegistered Employees</span>}
+    //     <Space>
+    //       <Input.Search placeholder="Search name" allowClear style={{ width: 200 }} />
+    //       <Popover
+    //         content={<FiltersPopover onApply={(filters) => console.log(filters)} />}
+    //         trigger="click"
+    //         placement="bottomLeft"
+    //       >
+    //         <Button icon={<FilterOutlined />}>Filters</Button>
+    //       </Popover>
+    //     </Space>
+    //   </div>
 
-      {/* First Table */}
-      <Table
-        columns={getColumns("employees")}
-        dataSource={employees}
-        size="small"
-        pagination={false}
-        bordered
+    //   {/* First Table */}
+    //   <Table
+    //     columns={getColumns("employees")}
+    //     dataSource={employees}
+    //     size="small"
+    //     pagination={false}
+    //     bordered
+    //   />
+    //   {/* Second Table */}
+    //   <div className="mt-8">
+    //   {<span className="text-xl  font-bold ">Registered Employees</span>}
+    //     <Table
+    //       columns={getColumns("contractEmployees")}
+    //       dataSource={contractEmployees}
+    //       size="small"
+    //       pagination={false}
+    //       bordered
+    //     />
+    //   </div>
+    //   {/* View Modal */}
+    //   <Modal
+    //     title="Employee Details"
+    //     open={modalVisible}
+    //     onCancel={() => setModalVisible(false)}
+    //     footer={<Button onClick={() => setModalVisible(false)}>Close</Button>}
+    //   >
+    //     {selectedEmployee && (
+    //       <div>
+    //         <p>
+    //           <b>Name:</b> {selectedEmployee.first_name} {selectedEmployee.last_name}
+    //         </p>
+    //         <p>
+    //           <b>Employee ID:</b> {selectedEmployee["employee code"]}
+    //         </p>
+    //         <p>
+    //           <b>Attendance ID:</b> {selectedEmployee["attendance id"]}
+    //         </p>
+    //         <p>
+    //           <b>Date of Joining:</b> {selectedEmployee["date of joining"]}
+    //         </p>
+    //         <p>
+    //           <b>Reporting Manager:</b> {selectedEmployee["reporting manager"]}
+    //         </p>
+    //         <p>
+    //           <b>Status:</b> {selectedEmployee.status}
+    //         </p>
+    //       </div>
+    //     )}
+    //   </Modal>
+
+    //   {/* Add/Edit Modal */}
+    //   <Modal
+    //     title={isEditing ? "Edit Employee" : "Add Employee"}
+    //     open={addEditModalVisible}
+    //     onCancel={() => setAddEditModalVisible(false)}
+    //     onOk={handleSaveEmployee}
+    //     okText={isEditing ? "Update" : "Save"}
+    //   >
+    //     <div style={{ textAlign: "center", marginBottom: 16 }}>
+    //       <Avatar
+    //         src={profileImage}
+    //         icon={!profileImage && <UserOutlined />}
+    //         size={80}
+    //         style={{
+    //           backgroundColor: "#EDE9FE",
+    //           color: primaryColor,
+    //           cursor: "pointer",
+    //         }}
+    //       />
+    //       <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 16 }}>
+    //         <Upload showUploadList={false} beforeUpload={handleProfileChange}>
+    //           <EditOutlined style={{ fontSize: 20, cursor: "pointer" }} title="Edit Profile" />
+    //         </Upload>
+    //         {profileImage && (
+    //           <DeleteOutlined
+    //             style={{ fontSize: 20, cursor: "pointer", color: "red" }}
+    //             onClick={handleRemoveProfile}
+    //             title="Remove Profile"
+    //           />
+    //         )}
+    //       </div>
+    //     </div>
+
+    //     <Form form={form} layout="vertical">
+    //       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+    //         <Form.Item name="first_name" label="First Name" rules={[{ required: true }]}>
+    //           <Input />
+    //         </Form.Item>
+    //         <Form.Item name="last_name" label="Last Name" rules={[{ required: true }]}>
+    //           <Input />
+    //         </Form.Item>
+    //         <Form.Item name="employeeid" label="Employee ID" rules={[{ required: true }]}>
+    //           <Input />
+    //         </Form.Item>
+    //         <Form.Item name="attendanceId" label="Attendance ID">
+    //           <Input />
+    //         </Form.Item>
+    //         <Form.Item name="dateOfJoining" label="Date of Joining" rules={[{ required: true }]}>
+    //           <DatePicker style={{ width: "100%" }} />
+    //         </Form.Item>
+    //         <Form.Item name="reportingManager" label="Reporting Manager">
+    //           <Input />
+    //         </Form.Item>
+    //         <Form.Item name="employeeType" label="Employee Type">
+    //           <Select>
+    //             <Option value="Permanent">Permanent</Option>
+    //             <Option value="Contract">Contract</Option>
+    //             <Option value="Intern">Intern</Option>
+    //           </Select>
+    //         </Form.Item>
+    //         <Form.Item name="shiftType" label="Shift Type">
+    //           <Select>
+    //             <Option value="Day">Day</Option>
+    //             <Option value="Night">Night</Option>
+    //           </Select>
+    //         </Form.Item>
+    //         <Form.Item name="status" label="Status">
+    //           <Select>
+    //             <Option value="active">Active</Option>
+    //             <Option value="inactive">Inactive</Option>
+    //           </Select>
+    //         </Form.Item>
+    //       </div>
+    //     </Form>
+    //   </Modal>
+    // </div>
+    <div className="bg-white p-6 rounded-lg shadow-sm">
+  {/* Header */}
+  <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+    <span className="font-semibold text-xl">UnRegistered Employees</span>
+    <Space>
+      <Input.Search placeholder="Search name" allowClear style={{ width: 200 }} />
+      <Popover
+        content={<FiltersPopover onApply={(filters) => console.log(filters)} />}
+        trigger="click"
+        placement="bottomLeft"
+      >
+        <Button icon={<FilterOutlined />}>Filters</Button>
+      </Popover>
+    </Space>
+  </div>
+
+  {/* UnRegistered Employees Table */}
+  <div className="mb-10">
+    <Table
+      columns={getColumns("employees")}
+      dataSource={employees}
+      size="small"
+      pagination={false}
+      bordered
+    />
+  </div>
+
+  {/* Registered Employees Section */}
+  <div>
+    <span className="font-semibold text-xl">
+      Registered Employees
+    </span>
+    <Table
+      columns={getColumns("contractEmployees")}
+      dataSource={contractEmployees}
+      size="small"
+      pagination={false}
+      bordered
+    />
+  </div>
+
+  {/* View Modal */}
+  <Modal
+    title="Employee Details"
+    open={modalVisible}
+    onCancel={() => setModalVisible(false)}
+    footer={<Button onClick={() => setModalVisible(false)}>Close</Button>}
+  >
+    {selectedEmployee && (
+      <div className="space-y-2">
+        <p><b>Name:</b> {selectedEmployee.first_name} {selectedEmployee.last_name}</p>
+        <p><b>Employee ID:</b> {selectedEmployee["employee code"]}</p>
+        <p><b>Attendance ID:</b> {selectedEmployee["attendance id"]}</p>
+        <p><b>Date of Joining:</b> {selectedEmployee["date of joining"]}</p>
+        <p><b>Reporting Manager:</b> {selectedEmployee["reporting manager"]}</p>
+        <p><b>Status:</b> {selectedEmployee.status}</p>
+      </div>
+    )}
+  </Modal>
+
+  {/* Add/Edit Modal */}
+  <Modal
+    title={isEditing ? "Edit Employee" : "Add Employee"}
+    open={addEditModalVisible}
+    onCancel={() => setAddEditModalVisible(false)}
+    onOk={handleSaveEmployee}
+    okText={isEditing ? "Update" : "Save"}
+  >
+    <div style={{ textAlign: "center", marginBottom: 16 }}>
+      <Avatar
+        src={profileImage}
+        icon={!profileImage && <UserOutlined />}
+        size={80}
+        style={{
+          backgroundColor: "#EDE9FE",
+          color: primaryColor,
+          cursor: "pointer",
+        }}
       />
-
-      {/* Second Table */}
-      <div className="mt-8">
-        <h2 className="text-4xl font-extrabold mb-6 bg-clip-text text-transparent bg-purple-500">Registered Employees</h2>
-        <Table
-          columns={getColumns("contractEmployees")}
-          dataSource={contractEmployees}
-          size="small"
-          pagination={false}
-          bordered
-        />
-      </div>
-
-      {/* View Modal */}
-      <Modal
-        title="Employee Details"
-        open={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        footer={<Button onClick={() => setModalVisible(false)}>Close</Button>}
-      >
-        {selectedEmployee && (
-          <div>
-            <p>
-              <b>Name:</b> {selectedEmployee.first_name} {selectedEmployee.last_name}
-            </p>
-            <p>
-              <b>Employee ID:</b> {selectedEmployee["employee code"]}
-            </p>
-            <p>
-              <b>Attendance ID:</b> {selectedEmployee["attendance id"]}
-            </p>
-            <p>
-              <b>Date of Joining:</b> {selectedEmployee["date of joining"]}
-            </p>
-            <p>
-              <b>Reporting Manager:</b> {selectedEmployee["reporting manager"]}
-            </p>
-            <p>
-              <b>Status:</b> {selectedEmployee.status}
-            </p>
-          </div>
-        )}
-      </Modal>
-
-      {/* Add/Edit Modal */}
-      <Modal
-        title={isEditing ? "Edit Employee" : "Add Employee"}
-        open={addEditModalVisible}
-        onCancel={() => setAddEditModalVisible(false)}
-        onOk={handleSaveEmployee}
-        okText={isEditing ? "Update" : "Save"}
-      >
-        <div style={{ textAlign: "center", marginBottom: 16 }}>
-          <Avatar
-            src={profileImage}
-            icon={!profileImage && <UserOutlined />}
-            size={80}
-            style={{
-              backgroundColor: "#EDE9FE",
-              color: primaryColor,
-              cursor: "pointer",
-            }}
+      <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 16 }}>
+        <Upload showUploadList={false} beforeUpload={handleProfileChange}>
+          <EditOutlined style={{ fontSize: 20, cursor: "pointer" }} title="Edit Profile" />
+        </Upload>
+        {profileImage && (
+          <DeleteOutlined
+            style={{ fontSize: 20, cursor: "pointer", color: "red" }}
+            onClick={handleRemoveProfile}
+            title="Remove Profile"
           />
-          <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 16 }}>
-            <Upload showUploadList={false} beforeUpload={handleProfileChange}>
-              <EditOutlined style={{ fontSize: 20, cursor: "pointer" }} title="Edit Profile" />
-            </Upload>
-            {profileImage && (
-              <DeleteOutlined
-                style={{ fontSize: 20, cursor: "pointer", color: "red" }}
-                onClick={handleRemoveProfile}
-                title="Remove Profile"
-              />
-            )}
-          </div>
-        </div>
-
-        <Form form={form} layout="vertical">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
-            <Form.Item name="first_name" label="First Name" rules={[{ required: true }]}>
-              <Input />
-            </Form.Item>
-            <Form.Item name="last_name" label="Last Name" rules={[{ required: true }]}>
-              <Input />
-            </Form.Item>
-            <Form.Item name="employeeid" label="Employee ID" rules={[{ required: true }]}>
-              <Input />
-            </Form.Item>
-            <Form.Item name="attendanceId" label="Attendance ID">
-              <Input />
-            </Form.Item>
-            <Form.Item name="dateOfJoining" label="Date of Joining" rules={[{ required: true }]}>
-              <DatePicker style={{ width: "100%" }} />
-            </Form.Item>
-            <Form.Item name="reportingManager" label="Reporting Manager">
-              <Input />
-            </Form.Item>
-            <Form.Item name="employeeType" label="Employee Type">
-              <Select>
-                <Option value="Permanent">Permanent</Option>
-                <Option value="Contract">Contract</Option>
-                <Option value="Intern">Intern</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="shiftType" label="Shift Type">
-              <Select>
-                <Option value="Day">Day</Option>
-                <Option value="Night">Night</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="status" label="Status">
-              <Select>
-                <Option value="active">Active</Option>
-                <Option value="inactive">Inactive</Option>
-              </Select>
-            </Form.Item>
-          </div>
-        </Form>
-      </Modal>
+        )}
+      </div>
     </div>
+
+    <Form form={form} layout="vertical">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+        <Form.Item name="first_name" label="First Name" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="last_name" label="Last Name" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="employeeid" label="Employee ID" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="attendanceId" label="Attendance ID">
+          <Input />
+        </Form.Item>
+        <Form.Item name="dateOfJoining" label="Date of Joining" rules={[{ required: true }]}>
+          <DatePicker style={{ width: "100%" }} />
+        </Form.Item>
+        <Form.Item name="reportingManager" label="Reporting Manager">
+          <Input />
+        </Form.Item>
+        <Form.Item name="employeeType" label="Employee Type">
+          <Select>
+            <Option value="Permanent">Permanent</Option>
+            <Option value="Contract">Contract</Option>
+            <Option value="Intern">Intern</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item name="shiftType" label="Shift Type">
+          <Select>
+            <Option value="Day">Day</Option>
+            <Option value="Night">Night</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item name="status" label="Status">
+          <Select>
+            <Option value="active">Active</Option>
+            <Option value="inactive">Inactive</Option>
+          </Select>
+        </Form.Item>
+      </div>
+    </Form>
+  </Modal>
+</div>
+
   );
 };
 
