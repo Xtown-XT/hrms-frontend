@@ -280,20 +280,6 @@ const Login = () => {
           <button type="submit" className="log-button" disabled={loading}>
             {loading ? <Loading /> : "LOGIN"}
           </button>
-           <div style={{ marginTop: "1rem", textAlign: "center" }}>
-              <span>Don't have an account?</span>
-              <span
-                style={{
-                  color: "#3d2c8bff",
-                  fontWeight: "bold",
-                  marginLeft: "4px",
-                  cursor: "pointer",
-                }}
-                onClick={() => navigate("/register")}
-              >
-                Register here
-              </span>
-            </div>
         </form>
       </div>
     </div>

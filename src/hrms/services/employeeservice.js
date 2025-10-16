@@ -12,7 +12,7 @@ function extractMessage(response, defaultMsg) {
 function extractErrorMessage(error, defaultMsg) {
   let errMsg;
   if (error.response) {
-    errMsg =jj
+    errMsg =
       error.response.data?.message ||
       error.response.data?.error ||
       (Array.isArray(error.response.data?.errors)
@@ -362,4 +362,3 @@ export const employeeService = {
     }
   },
 };
- 

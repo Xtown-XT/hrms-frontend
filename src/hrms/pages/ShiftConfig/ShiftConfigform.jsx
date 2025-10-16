@@ -1,244 +1,668 @@
-// // 
-// import React, { useState, useEffect } from "react";
-// import {
-//   Form,
-//   Input,
-//   Select,
-//   Row,
-//   Col,
-//   Button,
-//   TimePicker,
-//   Switch,
-//   message,
-//   DatePicker,
-// } from "antd";
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Button,
+  Input,
+  Select,
+  Popover,
+  message,
+  Checkbox,
+  Tag,
+  Dropdown,
+  Menu,
+} from "antd";
+import { branchServices } from "../../../company/services/CompanyServices";
+import { divisionService } from "../../../company/services/divisionService";
+import { departmentService } from "../../../company/services/departmentService";
+import { shiftService } from "../../services/shift";
+import { employeeService } from "../../services/employeeservice";
+import { shiftconfigService } from "../../services/Shiftconfig";
+import { useNavigate } from "react-router-dom";
+import {
+  FilterOutlined,
+  EllipsisOutlined,
+  PlusOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+const { Option } = Select;
 
-// import { useNavigate, useLocation } from "react-router-dom";
-// import dayjs from "dayjs";
+const ShiftConfigForm = () => {
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
+  const [effectiveDate, setEffectiveDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [daysOfWeek, setDaysOfWeek] = useState([]);
+  const [customStartTime, setCustomStartTime] = useState(null);
+  const [customEndTime, setCustomEndTime] = useState(null);
+  const [isRotational, setIsRotational] = useState(false);
+  const [rotationPattern, setRotationPattern] = useState([]); // e.g., [{ week: 1, shift_id: 3 }]
 
-// import { shiftService } from "../../services/shift";
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
 
-// const Shiftform = () => {
-//   const [form] = Form.useForm();
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const navigate = useNavigate();
-//   const [messageApi, contextHolder] = message.useMessage();
-//   const location = useLocation();
+  const [selectedWeeks, setSelectedWeeks] = useState([]);
+  const [weekShiftMap, setWeekShiftMap] = useState({});
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [popoverVisible, setPopoverVisible] = useState({});
+  const [selectedShiftName, setSelectedShiftName] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedDivision, setSelectedDivision] = useState("");
+  const navigate = useNavigate();
+  const [department, setDepartment] = useState([]);
+  const [shift, setShift] = useState([]);
+  const [division, setDivision] = useState([]);
+  const [branch, setBranch] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
 
-//   const { isEdit = false, initialValues = {} } = location.state || {};
+  const handleSubmit = async () => {
+    if (selectedEmployeeIds.length === 0) {
+      message.warning("Please select at least one employee.");
+      return;
+    }
 
-//   useEffect(() => {
-//     if (isEdit && initialValues && Object.keys(initialValues).length) {
-//       form.setFieldsValue({
-//         employee_id: initialValues.employee_id, // changed from shift
-//         shift_type: initialValues.shift_type,
-//         start_time: initialValues.start_time
-//           ? dayjs(initialValues.start_time, "HH:mm:ss")
-//           : null,
-//         end_time: initialValues.end_time
-//           ? dayjs(initialValues.end_time, "HH:mm:ss")
-//           : null,
-//         min_in_time: initialValues.min_in_time
-//           ? dayjs(initialValues.min_in_time, "HH:mm:ss")
-//           : null,
-//         max_out_time: initialValues.max_out_time
-//           ? dayjs(initialValues.max_out_time, "HH:mm:ss")
-//           : null,
-//         break_start_time: initialValues.break_start_time
-//           ? dayjs(initialValues.break_start_time, "HH:mm:ss")
-//           : null,
-//         break_end_time: initialValues.break_end_time
-//           ? dayjs(initialValues.break_end_time, "HH:mm:ss")
-//           : null,
-//         total_hours: initialValues.total_hours,
-//         is_night_shift: initialValues.is_night_shift || false,
-//         status: initialValues.status?.toLowerCase() || "inactive",
-//       });
-//     }
-//   }, [isEdit, initialValues, form]);
+    // if (
+    //   !effectiveDate ||
+    //   !customStartTime ||
+    //   !customEndTime ||
+    //   daysOfWeek.length === 0
+    // ) {
+    //   message.warning("Please complete all required fields.");
+    //   return;
+    // }
 
-//   const handleFormSubmit = async (values) => {
-//     setIsSubmitting(true);
+    if (isRotational && rotationPattern.length === 0) {
+      message.warning("Please assign shifts to weeks.");
+      return;
+    }
 
-//     const formatTime = (time) => (time ? dayjs(time).format("HH:mm:ss") : null);
+    const payload = {
+      effective_date: effectiveDate,
+      end_date: endDate || null,
+      days_of_week: daysOfWeek.join(","), // e.g., "Mon,Tue,Wed"
+      custom_start_time: dayjs(customStartTime).format("HH:mm:ss"),
+      custom_end_time: dayjs(customEndTime).format("HH:mm:ss"),
+      is_rotational: isRotational,
+      rotation_pattern: isRotational ? rotationPattern : undefined,
+      employee_with_shiftconfigs: selectedEmployeeIds.map((id) => ({
+        employee_id: id,
+      })),
+      status: "active",
+      is_active: true,
+    };
 
-//     const data = {
-//       employee_id: values.employee_id, // changed from shift
-//       shift_type: values.shift_type,
-//       start_time: formatTime(values.start_time),
-//       end_time: formatTime(values.end_time),
-//       min_in_time: formatTime(values.min_in_time),
-//       max_out_time: formatTime(values.max_out_time),
-//       break_start_time: formatTime(values.break_start_time),
-//       break_end_time: formatTime(values.break_end_time),
-//       total_hours: values.total_hours,
-//       is_night_shift: values.is_night_shift || false,
-//       status: isEdit ? values.status?.toLowerCase() || "inactive" : "active",
-//     };
+    try {
+      await shiftconfigService.createShiftconfig(payload);
+      message.success("Shift configuration created successfully!");
+      navigate("/hrms/pages/shiftconfiguration");
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to create shift configuration");
+    }
+  };
 
-//     try {
-//       if (isEdit) {
-//         await shiftService.updateShift(initialValues.id, data);
-//         messageApi.success("Shift updated successfully");
-//       } else {
-//         await shiftService.createShift(data);
-//         messageApi.success("Shift created successfully");
-//       }
+  const fetchEmployees = async (params = {}) => {
+    setLoading(true);
+    try {
+      const requestParams = {
+        page: params.page ?? pagination.current,
+        limit: params.pageSize ?? pagination.pageSize,
+        search: searchText,
+        sort_by: "created_at",
+        sort_order: "desc",
+        ...params,
+      };
 
-//       form.resetFields();
+      const response = await employeeService.getEmployees(requestParams);
+      console.log("Employee data (response.data):", response.data);
 
-//       navigate("/hrms/pages/shift", {
-//         state: {
-//           message: isEdit
-//             ? "Shift updated successfully"
-//             : "Shift created successfully",
-//         },
-//       });
-//     } catch (error) {
-//       messageApi.error("Operation failed");
-//       console.error("Shift operation failed:", error);
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
+      const rows = response.data || [];
 
-//   return (
-//     <>
-//       {contextHolder}
+      const formatted = rows
+        .filter((item) => item.id)
+        .map((item) => {
+          const addressParts = [
+            item.address_line1,
+            item.address_line2,
+            item.citys?.name,
+            item.states?.name,
+            item.countrys?.name,
+          ].filter(Boolean);
+          const fullAddress = addressParts.join(", ");
 
-//       <div className="p-6 max-w-6xl mx-auto rounded">
-//         <h2 className="text-xl font-semibold mb-4">
-//           {isEdit ? "Edit Shift" : "Add Shift"}
-//         </h2>
+          return {
+            key: item.id,
+            id: item.id,
+            employee: `${item.first_name} ${item.last_name}`,
+            address: fullAddress || "-",
+            phone: item.phone,
+            division: item.divisions || {},
+            department: item.departments || {},
+            branch: item.branch || {},
+            company: item.company || {},
+            designation: item.designation || {},
+            status: item.status,
+          };
+        });
 
-//         <Form
-//           layout="vertical"
-//           form={form}
-//           onFinish={handleFormSubmit}
-//           initialValues={{ status: "active", is_night_shift: false }}
-//         >
-//           <Row gutter={[16, 16]}>
-//             {/* Employee ID field */}
-//             <Col xs={24} sm={12}>
-//               <Form.Item
-//                 name="employee_id"
-//                 label="Employee ID"
-//                 rules={[{ required: true, message: "Please enter Employee ID" }]}
-//               >
-//                 <Input placeholder="Enter Emp ID" />
-//               </Form.Item>
-//             </Col>
+      console.log("Formatted employee data:", formatted);
 
-//             <Col xs={24} sm={12}>
-//               <Form.Item
-//                 name="Department"
-//                 label="Department"
-//                 rules={[{ required: true, message: "Please enter Department" }]}
-//               >
-//                 <Input placeholder="Enter Department" />
-//               </Form.Item>
-//             </Col>
+      setEmployees(formatted);
+      setPagination({
+        current: response.meta?.page || pagination.current,
+        pageSize: response.meta?.limit || pagination.pageSize,
+        total: response.meta?.total || pagination.total,
+      });
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      setEmployees([]);
+      setPagination((prev) => ({
+        current: 1,
+        pageSize: prev.pageSize,
+        total: 0,
+      }));
+      message.error(error.message || "Failed to fetch employees");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//             <Col xs={24} sm={12}>
-//               <Form.Item
-//                 name="Designation"
-//                 label="Designation"
-//                 rules={[{ required: true, message: "Please select Designation" }]}
-//               >
-//                 <Input placeholder="Enter Designation" />
-//               </Form.Item>
-//             </Col>
+  useEffect(() => {
+    fetchEmployees();
+    fetchDepartment();
+    fetchShift();
+    fetchDivision();
+    fetchBranch();
+  }, [searchText, pagination.current, pagination.pageSize]);
 
-//             <Col xs={24} sm={12}>
-//               <Form.Item
-//                 name="Shift Name"
-//                 label="Shift Name"
-//                 rules={[{ required: true, message: "Please select Shift Name" }]}
-//               >
-//                 <Input placeholder="Enter Sift Name" />
-//               </Form.Item>
-//             </Col>
+  const fetchShift = async () => {
+    try {
+      const response = await shiftService.getshiftAll();
+      setShift(response.data.data || []);
+    } catch (error) {
+      messageApi.error("Failed to fetch shift");
+      console.error("Fetch shift error:", error);
+    }
+  };
 
-//             <Col xs={24} sm={12}>
-//               <Form.Item name="Shift timing" label="Shift Timing">
-//                 <TimePicker format="HH:mm:ss" className="w-full" />
-//               </Form.Item>
-//             </Col>
+  const fetchDepartment = async () => {
+    try {
+      const response = await departmentService.getAllDepartments();
+      setDepartment(response.data || []);
+    } catch (error) {
+      messageApi.error("Failed to fetch departments");
+      console.error("Fetch departments error:", error);
+    }
+  };
 
-//             <Col xs={24} sm={12}>
-//               <Form.Item name="start date" label="Start Date">
-//                <DatePicker className="w-full" />
-//               </Form.Item>
-//             </Col>
+  const fetchDivision = async () => {
+    try {
+      const response = await divisionService.getAllDivisions();
+      setDivision(response.data || []);
+    } catch (error) {
+      messageApi.error("Failed to fetch divisions");
+      console.error("Fetch divisions error:", error);
+    }
+  };
+  const fetchBranch = async () => {
+    try {
+      const response = await branchServices.getBranch();
+      setBranch(response.data || []);
+    } catch (error) {
+      messageApi.error("Failed to fetch branches");
+      console.error("Fetch branches error:", error);
+    }
+  };
 
-//             <Col xs={24} sm={12}>
-//               <Form.Item name="end date" label="End Date">
-//                 <DatePicker className="w-full" />
-//               </Form.Item>
-//             </Col>
+  const handleCheckboxChange = (e) => {
+    setIsRotational(e.target.checked);
+    if (!e.target.checked) {
+      setSelectedWeeks([]);
+      setWeekShiftMap({});
+      setDropdownVisible(false);
+      setPopoverVisible({});
+    } else {
+      setDropdownVisible(true);
+    }
+  };
+  const handleWeekChange = (weeks) => {
+    setSelectedWeeks(weeks);
+    const updatedMap = {};
+    weeks.forEach((week) => {
+      if (weekShiftMap[week]) {
+        updatedMap[week] = weekShiftMap[week];
+      }
+    });
+    setWeekShiftMap(updatedMap);
+  };
+  const handleShiftChange = (week, shift) => {
+    setWeekShiftMap((prev) => ({
+      ...prev,
+      [week]: shift,
+    }));
 
-//             <Col xs={24} sm={12}>
-//               <Form.Item
-//                 name="Assignment type"
-//                 label="Assignment Type"
-//                 rules={[{ required: true, message: "Please select Assignment Type" }]}
-//               >
-//                 <Select placeholder="Select Assignment Type">
-//                         <Option value="permanent">Permanent</Option>
-//                         <Option value="temporary">Temporary</Option>
-//                       </Select>
-//               </Form.Item>
-//             </Col>
-//             <Col xs={24} sm={12}>
-//               <Form.Item
-//                 name="is_night_shift"
-//                 label="Night Shift"
-//                 valuePropName="checked"
-//               >
-//                 <Switch />
-//               </Form.Item>
-//             </Col>
+    setPopoverVisible((prev) => ({
+      ...prev,
+      [week]: false,
+    }));
+  };
+  const handlePopoverVisibleChange = (week, visible) => {
+    setPopoverVisible((prev) => ({
+      ...prev,
+      [week]: visible,
+    }));
+  };
 
-//             {isEdit && (
-//               <Col xs={24} sm={12}>
-//                 <Form.Item
-//                   name="status"
-//                   label="Status"
-//                   rules={[{ required: true, message: "Please select status" }]}
-//                 >
-//                   <Select placeholder="Select status">
-//                     <Select.Option value="active">Active</Select.Option>
-//                     <Select.Option value="inactive">Inactive</Select.Option>
-//                   </Select>
-//                 </Form.Item>
-//               </Col>
-//             )}
-//           </Row>
+  const renderShiftPopover = (week) => (
+    <div style={{ padding: 8 }}>
+      <Select
+        placeholder="Select Shift"
+        style={{ width: 150 }}
+        value={weekShiftMap[week] || undefined}
+        onChange={(shift) => handleShiftChange(week, shift)}
+        allowClear
+      >
+        {shift.map((item) => (
+          <Select.Option key={item.id} value={item.shift_name}>
+            {item.shift_name}
+          </Select.Option>
+        ))}
+      </Select>
+    </div>
+  );
 
-//           <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
-//             <Button
-//               danger
-//               onClick={() => navigate("/hrms/pages/shift")}
-//               className="w-full sm:w-auto"
-//             >
-//               Cancel
-//             </Button>
+  const getWeekLabel = (week) => {
+    const shift = weekShiftMap[week];
+    const weekNumber = week.slice(-1);
+    return shift
+      ? `Week ${weekNumber} – ${shift.charAt(0).toUpperCase() + shift.slice(1)}`
+      : `Week ${weekNumber}`;
+  };
 
-//             <Button
-//               type="primary"
-//               htmlType="submit"
-//               loading={isSubmitting}
-//               className="w-full sm:w-auto"
-//             >
-//               Submit
-//             </Button>
-//           </div>
-//         </Form>
-//       </div>
-//     </>
-//   );
-// };
+  const placeholder =
+    selectedWeeks.length > 0
+      ? `Select Weeks (${selectedWeeks.length})`
+      : "Select Weeks";
 
-// export default Shiftform;
+  const handleTableChange = (newPagination) => {
+    setPagination(newPagination);
+  };
 
+  const handleApply = () => {
+    console.log("Apply clicked with:", { isRotational, weekShiftMap });
+    setDropdownVisible(false);
+    setPopoverVisible({});
+  };
 
+  const handleReset = () => {
+    setSelectedWeeks([]);
+    setWeekShiftMap({});
+    setPopoverVisible({});
+  };
+
+  const dropdownRender = (menu) => (
+    <div style={{ padding: "8px" }}>
+      {["week1", "week2", "week3", "week4"].map((week) => (
+        <Popover
+          key={week}
+          content={renderShiftPopover(week)}
+          trigger="hover"
+          placement="left"
+          open={popoverVisible[week] || false}
+          onOpenChange={(visible) => handlePopoverVisibleChange(week, visible)}
+        >
+          <div
+            style={{
+              padding: "5px 12px",
+              cursor: "pointer",
+              backgroundColor: selectedWeeks.includes(week)
+                ? "#e6f7ff"
+                : "white",
+            }}
+          >
+            {getWeekLabel(week)}
+          </div>
+        </Popover>
+      ))}
+      <div
+        style={{
+          borderTop: "1px solid #f0f0f0",
+          padding: "8px 12px",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Button
+          danger
+          size="small"
+          onClick={handleReset}
+          disabled={
+            selectedWeeks.length === 0 && Object.keys(weekShiftMap).length === 0
+          }
+        >
+          Reset
+        </Button>
+        <Button
+          type="primary"
+          size="small"
+          onClick={handleApply}
+          disabled={
+            selectedWeeks.length === 0 && Object.keys(weekShiftMap).length === 0
+          }
+        >
+          Apply
+        </Button>
+      </div>
+    </div>
+  );
+
+  // const branchOptions = [];
+  // const departmentOptions = [];
+  // const divisionOptions = [];
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: setSelectedRowKeys,
+    selections: [
+      Table.SELECTION_ALL,
+      Table.SELECTION_INVERT,
+      Table.SELECTION_NONE,
+    ],
+  };
+
+  const capitalizeWords = (text) => {
+    return text?.replace(/\b\w/g, (char) => char.toUpperCase()) || "";
+  };
+
+  const columns = [
+    {
+      title: "S.No",
+      key: "serialNumber",
+      width: 70,
+      render: (_, __, index) =>
+        (pagination.current - 1) * pagination.pageSize + index + 1,
+    },
+    {
+      title: "Employee",
+      dataIndex: "employee",
+      key: "employee",
+      render: (name) => capitalizeWords(name),
+    },
+    {
+      title: "Company",
+      dataIndex: ["company", "name"],
+      key: "company_name",
+      render: (name) => capitalizeWords(name),
+    },
+    {
+      title: "Branch",
+      dataIndex: ["branch", "name"],
+      key: "branch_name",
+      render: (name) => capitalizeWords(name),
+    },
+    {
+      title: "Department",
+      dataIndex: ["department", "name"],
+      key: "department_name",
+      render: (name) => capitalizeWords(name),
+    },
+    {
+      title: "Division",
+      dataIndex: ["division", "name"],
+      key: "division_name",
+      render: (name) => capitalizeWords(name),
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      render: (phone) => phone || "",
+    },
+    {
+      title: "Address",
+      dataIndex: "address",
+      key: "address",
+      render: (address) => capitalizeWords(address),
+    },
+    {
+      title: "Designation",
+      dataIndex: ["designation", "name"],
+      key: "designation_name",
+      render: (name) => capitalizeWords(name),
+    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   key: "status",
+    //   render: (status) => (
+    //     <Tag color={status === "active" ? "green" : "red"}>
+    //       {status ? status.charAt(0).toUpperCase() + status.slice(1) : "-"}
+    //     </Tag>
+    //   ),
+    // },
+    // {
+    //   title: "Actions",
+    //   key: "actions",
+    //   render: (_, record) => (
+    //     <Dropdown
+    //       overlay={
+    //         <Menu onClick={(e) => handleMenuClick(record, e)}>
+    //           <Menu.Item key="view" icon={<EyeOutlined />}>
+    //             View
+    //           </Menu.Item>
+    //           <Menu.Item key="edit" icon={<EditOutlined />}>
+    //             Edit
+    //           </Menu.Item>
+    //           <Menu.Item key="delete" icon={<DeleteOutlined />}>
+    //             Delete
+    //           </Menu.Item>
+    //         </Menu>
+    //       }
+    //       trigger={["click"]}
+    //     >
+    //       <a onClick={(e) => e.preventDefault()}>
+    //         <EllipsisOutlined
+    //           style={{ fontSize: 18, cursor: "pointer" }}
+    //           rotate={90}
+    //         />
+    //       </a>
+    //     </Dropdown>
+    //   ),
+    // },
+  ];
+
+  return (
+    <>
+      {contextHolder}
+
+      <div className="max-w-full overflow-hidden">
+        <div className="bg-white">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-10 gap-2">
+            <h1 className="text-xl font-semibold">
+              Create Shift Configuration
+            </h1>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center w-full sm:w-auto">
+                <label className="flex items-center font-semibold gap-1 mr-4">
+                  <Checkbox
+                    checked={isRotational}
+                    onChange={handleCheckboxChange}
+                  />
+                  Rotational
+                </label>
+
+                {!isRotational && (
+                  <Select
+                    placeholder="Select Shift Name"
+                    className="w-40"
+                    value={selectedShiftName}
+                    onChange={(value) => setSelectedShiftName(value)}
+                    allowClear
+                  >
+                    {shift.map((item) => (
+                      <Select.Option key={item.id} value={item.shift_name}>
+                        {item.shift_name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
+
+                {isRotational && (
+                  <Select
+                    mode="multiple"
+                    placeholder={placeholder}
+                    className="w-40"
+                    value={selectedWeeks}
+                    onChange={handleWeekChange}
+                    dropdownRender={dropdownRender}
+                    open={dropdownVisible}
+                    showSearch={false}
+                    suffixIcon={null}
+                    onDropdownVisibleChange={(visible) => {
+                      if (!visible && selectedWeeks.length > 0) {
+                        setDropdownVisible(false);
+                      } else if (!visible && selectedWeeks.length === 0) {
+                        setDropdownVisible(true);
+                      } else {
+                        setDropdownVisible(visible);
+                      }
+                    }}
+                  >
+                    {["week1", "week2", "week3", "week4"].map((week) => (
+                      <Option key={week} value={week}>
+                        {getWeekLabel(week)}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              </div>
+
+              <div className="w-full sm:w-[250px] min-w-[200px]">
+                <Input.Search
+                  placeholder="Search by role name"
+                  value={searchText}
+                  // onChange={handleSearchChange}
+                  className="w-full"
+                  allowClear
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-2">
+          <div className="flex space-x-4 mb-4">
+            {/* Branch */}
+            <div className="flex-1">
+              <label className="block mb-1 font-medium text-gray-700">
+                Select Branch
+              </label>
+
+              <Select placeholder="Select branch" className="w-full" allowClear>
+                {branch?.data?.branches?.map((branchItem) => (
+                  <Option key={branchItem.id} value={branchItem.id}>
+                    {branchItem.name}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Department */}
+            <div className="flex-1">
+              <label className="block mb-1 font-medium text-gray-700">
+                Select Department
+              </label>
+
+              <Select
+                placeholder="Select department"
+                className="w-full"
+                allowClear
+              >
+                {department?.departments?.map((dept) => (
+                  <Option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Division */}
+            <div className="flex-1">
+              <label className="block mb-1 font-medium text-gray-700">
+                Select Division
+              </label>
+
+              <Select
+                placeholder="Select division"
+                className="w-full"
+                allowClear
+              >
+                {division?.divisions?.map((div) => (
+                  <Option key={div.id} value={div.id}>
+                    {div.name}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          <Table
+            rowSelection={rowSelection}
+            columns={columns}
+            dataSource={employees}
+            size="small"
+            pagination={{
+              pageSize: 10,
+              responsive: true,
+              showSizeChanger: true,
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
+            }}
+            onChange={handleTableChange}
+            rowKey="id"
+            scroll={{ x: "max-content" }}
+            className="min-w-full"
+            components={{
+              header: {
+                cell: (props) => (
+                  <th
+                    {...props}
+                    style={{
+                      position: "sticky",
+                      top: 0,
+                      zIndex: 2,
+                      padding: "8px 8px",
+                      whiteSpace: "nowrap",
+                    }}
+                  />
+                ),
+              },
+            }}
+          />
+        </div>
+        <div className="flex justify-end space-x-2 mb-4">
+          <Button
+            danger
+            onClick={() => navigate("/hrms/pages/shiftconfiguration")}
+            className="w-full sm:w-auto"
+          >
+            Cancel
+          </Button>
+          <Button type="primary" onClick={handleSubmit}>
+            Submit
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default ShiftConfigForm;

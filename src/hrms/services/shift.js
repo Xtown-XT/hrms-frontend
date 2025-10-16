@@ -32,7 +32,7 @@ function extractErrorMessage(error, defaultMsg) {
 export const shiftService = {
 
     getshiftAll: async (params) => {
-        const response = await Api.get('/hrms/shift',{params});
+        const response = await Api.get('/api/shift/getshift',{params});
 
         return response;
 
@@ -40,7 +40,7 @@ export const shiftService = {
 
     createShift: async (data) => {
         try {
-            const res = await Api.post('/hrms/shift', data);
+            const res = await Api.post('/api/shift/addshift', data);
             const msg = extractMessage(res, 'shift created successfully');
             message.success(msg);
             return { success: true, data: res.data, statusCode: res.status };
