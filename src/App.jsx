@@ -5,7 +5,6 @@ import dashboard from "./components/assets/dashboard.png";
 //import ssms from "./components/assets/sewing-machine.png";
 import company from "../public/factory.png";
 import Login from "./login/Login";
-import Register from "./login/RegisterPage";
 import ProtectedRoute from "./context/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import Loading from "./utils/Loading";
@@ -56,7 +55,7 @@ const App = () => {
       <Suspense fallback={<div className="p-4"><Loading /></div>}>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+
           <Route element={<MainLayout menuItems={menuItems} />}>
             <Route
               path="/"
