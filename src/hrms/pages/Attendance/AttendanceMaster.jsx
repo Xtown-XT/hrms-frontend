@@ -26,7 +26,7 @@ export default function AttendanceTable() {
   const [detailModal, setDetailModal] = useState({ open: false, title: "", present: [], absent: [] });
   const [employeeDetailModal, setEmployeeDetailModal] = useState({ open: false, employee: null });
 
-  // Fetch records
+
   const fetchRecords = async () => {
     try {
       setLoading(true);
@@ -313,7 +313,7 @@ export default function AttendanceTable() {
         </div>
       )}
 
-      {/* Pagination */}
+
       <div className="flex items-center justify-between mt-6">
         <div className="text-sm text-gray-600">
           Showing {filteredRecords.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + rowsPerPage, filteredRecords.length)} of{" "}
@@ -332,7 +332,7 @@ export default function AttendanceTable() {
         </div>
       </div>
 
-      {/* Modals */}
+
       {modalOpen && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl w-full max-w-md shadow-2xl">
@@ -385,7 +385,7 @@ export default function AttendanceTable() {
         </div>
       )}
 
-      {/* Detail and Employee modals remain the same as your original code */}
+
     </div>
   );
 }

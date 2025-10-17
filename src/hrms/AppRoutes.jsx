@@ -18,7 +18,7 @@ import {
   ContactsOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
-import Asset from "./pages/AssetAllocation/Asset";
+import Asset from "./pages/AssetAllocation/Asset"; 
 import Payroll from "./pages/PayRoll/PayRoll";
 import { Children } from "react";
 import AttenOt from "./pages/Attendance/AttenOt";
